@@ -1,0 +1,15 @@
+{
+  "extends": "next/core-web-vitals",
+  "rules": {
+    "semi": "error",
+    "eol-last": "error",
+    "object-curly-spacing": "error",
+    "arrow-spacing": "error",
+    "array-bracket-spacing": "error",
+    "func-call-spacing": "error",
+    "quotes": [
+      "error",
+      "single"
+    ]
+  }
+}

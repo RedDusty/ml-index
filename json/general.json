@@ -1,0 +1,28 @@
+{
+	"abilities": {
+		"categories": [
+			"passive",
+			"skill",
+			"ultimate",
+			"extra"
+		],
+		"effects": [
+			"charge",
+			"burst",
+			"blink",
+			"aoe",
+			"buff"
+		],
+		"types": [
+			"physical_skill",
+			"charge",
+			"blink"
+		]
+	},
+	"events": [
+		{
+			"name": "The_Aspirants",
+			"icon": "the_aspirants"
+		}
+	]
+}
