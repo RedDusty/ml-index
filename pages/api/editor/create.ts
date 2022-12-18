@@ -9,28 +9,35 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-	const editor = req.query.editor as editorType;
+	// console.log(req.socket.address());
+	// console.log(req.socket.localAddress);
+	// console.log(req.socket.remoteAddress);
+	// console.log(req.connection.remoteAddress);
+	// if (ipadd)
+	return res.status(200).send(req.socket.remoteAddress);
+	
+	// const editor = req.query.editor as editorType;
 
-	if (typeof editor !== 'string') {
-		res.status(404).send('editor wrong');
-		return;
-	}
+	// if (typeof editor !== 'string') {
+	// 	res.status(404).send('editor wrong');
+	// 	return;
+	// }
 
-	let redirect: string | undefined = undefined;
+	// let redirect: string | undefined = undefined;
 
-	switch (editor) {
-		case 'ability':
-			const ability = req.body as abilityType;
-			redirect = await abilityCreate(ability);
-			break;
-	}
+	// switch (editor) {
+	// 	case 'ability':
+	// 		const ability = req.body as abilityType;
+	// 		redirect = await abilityCreate(ability);
+	// 		break;
+	// }
 
-	if (typeof redirect !== 'string') {
-		res.status(404).send('redirect error');
-		return;
-	}
+	// if (typeof redirect !== 'string') {
+	// 	res.status(404).send('redirect error');
+	// 	return;
+	// }
 
-	res.status(200).send(redirect);
+	// res.status(200).send(redirect);
 }
 
 async function abilityCreate(ability: abilityType) {

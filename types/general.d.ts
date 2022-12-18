@@ -1,3 +1,6 @@
+declare module '*.gltf';
+declare module '*.glb';
+
 type abilityCategoryType = 'passive' | 'skill' | 'ultimate' | 'extra';
 
 type abilityEffectType = 'charge' | 'burst' | 'blink' | 'aoe' | 'buff';

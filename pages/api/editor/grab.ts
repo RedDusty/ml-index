@@ -11,37 +11,18 @@ export default async function handler(
 	const json_dir = path.join(process.cwd(), 'json');
 	const public_dir = path.join(process.cwd(), 'public');
 	
-	rmSync(process.cwd() + '/temp', {recursive: true});
+	rmSync(process.cwd() + '/temp', {recursive: true, force: true});
 	await promises.mkdir(process.cwd() + '/temp', {recursive: true});
-	
-	const output_json = createWriteStream(process.cwd() + '/temp/output_json.zip');
 	const archive = archiver('zip');
 
-	archive.pipe(output_json);
-	archive.directory(json_dir, false);
+	const output = createWriteStream(process.cwd() + '/temp/output.zip');
+
+	archive.pipe(output);
+	archive.directory(json_dir, 'json', {date: new Date()});
+	archive.directory(public_dir + '/icons', 'icons', {date: new Date()});
 	await archive.finalize();
 
-	output_json.on('close', function () {
-		console.log('output_json.zip: ' + archive.pointer() + ' total bytes');
-	});
-
-	const output_icons = createWriteStream(process.cwd() + '/temp/output_icons.zip');
-
-	archive.pipe(output_icons);
-	archive.directory(public_dir + '/icons', false);
-	await archive.finalize();
-
-	output_icons.on('close', function () {
-		console.log('output_icons.zip: ' + archive.pointer() + ' total bytes');
-	});
-
-	const output_all = createWriteStream(process.cwd() + '/temp/output.zip');
-
-	archive.pipe(output_all);
-	archive.directory(process.cwd + '/temp', false);
-	await archive.finalize();
-
-	output_all.on('close', function () {
+	output.on('close', function () {
 		console.log('output.zip: ' + archive.pointer() + ' total bytes');
 	});
 
