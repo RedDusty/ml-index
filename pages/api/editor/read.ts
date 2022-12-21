@@ -40,8 +40,10 @@ export default async function handler(
 		case 'events':
 			for (let index = 0; index < json.events.length; index++) {
 				const event = json.events[index];
-				const icon_file = await promises.readFile(public_dir + '/icons/events/' + event.icon + '.webp', 'base64');
-				event.icon = 'data:image/webp;base64,' + icon_file;
+				if (event.icon) {
+					const icon_file = await promises.readFile(public_dir + '/icons/events/' + event.icon + '.webp', 'base64');
+					event.icon = 'data:image/webp;base64,' + icon_file;
+				}
 			}
 		default:
 			break;

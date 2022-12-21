@@ -20,6 +20,7 @@ export default async function handler(
 	archive.pipe(output);
 	archive.directory(json_dir, 'json', {date: new Date()});
 	archive.directory(public_dir + '/icons', 'icons', {date: new Date()});
+	archive.directory(public_dir + '/models', 'models', {date: new Date()});
 	await archive.finalize();
 
 	output.on('close', function () {

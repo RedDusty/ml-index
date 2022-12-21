@@ -21,6 +21,9 @@
 	},
 	"events": [
 		{
+			"name": "Default"
+		},
+		{
 			"name": "The_Aspirants",
 			"icon": "the_aspirants"
 		}

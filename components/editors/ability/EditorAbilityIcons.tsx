@@ -91,7 +91,7 @@ export default function EditorAbilityIcons({setAbility, event_icons}: props) {
 
 	const eventIconAddHandler = () => {
 		if (event && eicon) {
-			const event_icon: abilityEventIconsType = {name: event.name, icon: eicon, event_icon: event.icon};
+			const event_icon: abilityEventIconsType = {name: event.name, icon: eicon, event_icon: event.icon!};
 			setAbility((prev) => {
 				return {
 					...prev,
