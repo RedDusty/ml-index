@@ -24,6 +24,48 @@
 			"name": "Default"
 		},
 		{
+			"name": "Default_alt"
+		},
+		{
+			"name": "Elite"
+		},
+		{
+			"name": "Epic"
+		},
+		{
+			"name": "Special"
+		},
+		{
+			"name": "Collector"
+		},
+		{
+			"name": "Zodiac"
+		},
+		{
+			"name": "Stun"
+		},
+		{
+			"name": "Abyss"
+		},
+		{
+			"name": "Venom"
+		},
+		{
+			"name": "MDT"
+		},
+		{
+			"name": "M_world"
+		},
+		{
+			"name": "Starlight"
+		},
+		{
+			"name": "M4"
+		},
+		{
+			"name": "Prime"
+		},
+		{
 			"name": "The_Aspirants",
 			"icon": "the_aspirants"
 		}

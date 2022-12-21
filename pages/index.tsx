@@ -5,20 +5,23 @@ import getModelsNames from 'scripts/api/models';
 
 export default function Models({models}: InferGetStaticPropsType<typeof getStaticProps>) {
 	return (
-		<div className='bg-blue-900 w-screen h-screen flex justify-start items-start gap-4 p-2'>
+		<div className='bg-blue-900 w-screen h-screen flex flex-wrap justify-start items-start gap-4 p-2'>
 			{
 				models.map((m, i) => {
+					const model = m.split('_');
 					return (
 						<Link
 							href={{
 								pathname: '/viewer', query: {
-								m: m
+									h: model[0],
+									s: model[1],
+									k: model[2]
 								}
 							}}
 							key={m + i}
 							className='rounded-md text-black bg-white hover:bg-sky-200 font-semibold p-2'
 						>
-							{(m.charAt(0).toUpperCase() + m.slice(1)).replace('_', ' ')}
+							{(model[0].charAt(0).toUpperCase() + model[0].slice(1)) + ' ' + model[1] + ' ' + i}
 						</Link>
 					);
 				})

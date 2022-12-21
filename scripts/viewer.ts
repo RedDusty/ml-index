@@ -44,7 +44,7 @@ function Viewer(div: HTMLDivElement, model: modelType) {
 	renderer.render(scene, camera);
 
 	const loader = new GLTFLoader();
-	const model_path = typeof model === 'string' ? model : window.location.origin + '/models/' + model.hero + '/' + model.skin + '.gltf';
+	const model_path = typeof model === 'string' ? model : window.location.origin + '/models/' + model.hero + '/' + model.skin + '_' + model.key + '.gltf';
 	loader.load(model_path, (gltfScene) => {
 		scene.add(gltfScene.scene);
 		gltfScene.scene.traverse((child: any) => {

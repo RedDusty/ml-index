@@ -32,7 +32,7 @@ export default function EditorModel() {
 					const events = res.data as generalEventType[];
 	
 					setEvents(events ?? []);
-					modelEventHanlder(events[0].name);
+					modelEventHanlder(events[0]);
 				}
 			} catch (error) {
 				console.log(error);
@@ -46,10 +46,10 @@ export default function EditorModel() {
 		};
 	}, [model.file]);
 
-	const modelEventHanlder = (v: EventsNameType) => {
+	const modelEventHanlder = (v: any) => {
 		setModel((prev) => {
 			return {
-				...prev, event: v
+				...prev, event: v.name
 			};
 		});
 	};

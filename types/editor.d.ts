@@ -57,11 +57,12 @@ interface abilityType extends abilityBaseType, abilityLangType { }
 type modelType = {
 	hero: string;
 	skin: EventsNameType;
+	key: string;
 } | string
 
 interface modelBaseType {
 	hero: string;
-	event?: EventsNameType;
+	event: EventsNameType;
 }
 
 interface modelAPIType extends modelBaseType {
@@ -70,4 +71,5 @@ interface modelAPIType extends modelBaseType {
 
 interface modelClientType extends modelBaseType {
 	url: string;
+	key: string;
 }

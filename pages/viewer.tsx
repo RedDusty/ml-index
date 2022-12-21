@@ -9,13 +9,14 @@ import getModelsNames from 'scripts/api/models';
 export default function Models() {
 	const query = useRouter().query;
 
-	if (query.m && typeof query.m === 'string' ) {
-		const hero = query.m.split('_')[0];
-		const skin = query.m.split('_')[1] as EventsNameType;
+	if (typeof query.h === 'string' && typeof query.s === 'string' && typeof query.k === 'string') {
+		const hero = query.h;
+		const skin = query.s as EventsNameType;
+		const key = query.k;
 
 		return (
 			<div className='w-screen, h-screen'>
-				<ModelViewer model={{hero, skin}} />
+				<ModelViewer model={{hero, skin, key}} />
 			</div>
 		);
 	}

@@ -11,8 +11,8 @@ export default async function handler(
 	const json_dir = path.join(process.cwd(), 'json');
 	const public_dir = path.join(process.cwd(), 'public');
 	
-	rmSync(process.cwd() + '/temp', {recursive: true, force: true});
 	await promises.mkdir(process.cwd() + '/temp', {recursive: true});
+	rmSync(process.cwd() + '/temp', {recursive: true, force: true});
 	const archive = archiver('zip');
 
 	const output = createWriteStream(process.cwd() + '/temp/output.zip');

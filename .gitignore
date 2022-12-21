@@ -5,6 +5,7 @@ temp
 json/abilities
 json/heroes
 json/items
+json/models
 
 public/icons/abilities
 public/icons/heroes
