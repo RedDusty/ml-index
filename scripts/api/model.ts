@@ -2,16 +2,18 @@ import {existsSync, promises} from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 
-const json_dir = path.join(process.cwd(), 'json');
-const public_dir = path.join(process.cwd(), 'public');
-
 async function ModelCreate(model: modelAPIType) {
+	await promises.mkdir(path.join(process.cwd(), 'json'), {recursive: true});
+	await promises.mkdir(path.join(process.cwd(), 'models'), {recursive: true});
+	const json_dir = path.join(process.cwd(), 'json');
+	const models_dir = path.join(process.cwd(), 'models');
+
 	const model_hero = model.hero.toLowerCase().replace(' ', '_');
 	const model_event = model.event.toLowerCase().replace(' ', '_') as EventsNameType;
 	
-	const model_path = path.join(public_dir, 'models', model_hero, model_event);
+	const model_path = path.join(models_dir, model_hero, model_event);
 
-	await promises.mkdir(path.join(public_dir, 'models', model_hero), {recursive: true});
+	await promises.mkdir(path.join(models_dir, model_hero), {recursive: true});
 	
 	let key: string = crypto.randomBytes(16).toString('hex');
 	while (existsSync(model_path + '_' + key + '.gltf')) {
@@ -22,7 +24,7 @@ async function ModelCreate(model: modelAPIType) {
 	
 	const model_client: modelClientType = {
 		hero: model_hero,
-		url: 'public/models/' + model_hero + '/' + model_event,
+		url: 'models/' + model_hero + '/' + model_event,
 		event: model_event,
 		key: key
 	};

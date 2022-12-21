@@ -10,7 +10,7 @@ json/models
 public/icons/abilities
 public/icons/heroes
 public/icons/items
-public/models
+models
 
 # dependencies
 /node_modules

@@ -8,8 +8,10 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+	await promises.mkdir(path.join(process.cwd(), 'json'), {recursive: true});
+	await promises.mkdir(path.join(process.cwd(), 'models'), {recursive: true});
+	const models_dir = path.join(process.cwd(), 'models');
 	const json_dir = path.join(process.cwd(), 'json');
-	const public_dir = path.join(process.cwd(), 'public');
 	
 	await promises.mkdir(process.cwd() + '/temp', {recursive: true});
 	rmSync(process.cwd() + '/temp', {recursive: true, force: true});
@@ -19,8 +21,7 @@ export default async function handler(
 
 	archive.pipe(output);
 	archive.directory(json_dir, 'json', {date: new Date()});
-	archive.directory(public_dir + '/icons', 'icons', {date: new Date()});
-	archive.directory(public_dir + '/models', 'models', {date: new Date()});
+	archive.directory(models_dir, 'models', {date: new Date()});
 	await archive.finalize();
 
 	output.on('close', function () {
