@@ -11,6 +11,7 @@ public/icons/abilities
 public/icons/heroes
 public/icons/items
 models
+ml-index-key.json
 
 # dependencies
 /node_modules
@@ -23,6 +24,7 @@ models
 # next.js
 /.next/
 /out/
+/tmp
 
 # production
 /build
@@ -38,6 +40,7 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # local env files
+.env
 .env*.local
 
 # vercel

@@ -1,7 +1,6 @@
 import type {NextApiRequest, NextApiResponse} from 'next';
 import {AbilityCreate} from 'scripts/api/ability';
-import {ModelCreate} from 'scripts/api/model';
-import {promises} from 'fs';
+import {ModelCreate} from 'scripts/api/modelCreate';
 
 export default async function handler(
   req: NextApiRequest,
@@ -28,7 +27,7 @@ export default async function handler(
 			break;
 		case 'ability':
 			const ability = req.body as abilityType;
-			redirect = await AbilityCreate(ability);
+			// redirect = await AbilityCreate(ability);
 			break;
 	}
 

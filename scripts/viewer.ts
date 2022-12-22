@@ -1,3 +1,4 @@
+import axios from 'axios';
 import {AmbientLight, Color, DirectionalLight, FrontSide, MeshStandardMaterial, PerspectiveCamera, PointLight, Scene, sRGBEncoding, WebGLRenderer} from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader';
@@ -21,7 +22,7 @@ function init() {
 	ambient_light = new AmbientLight(0xffffff, 0.3);
 }
 
-function Viewer(div: HTMLDivElement, model: modelType) {
+async function Viewer(div: HTMLDivElement, model: modelType) {
 	if (scene) {
 		scene.clear();
 	}
@@ -43,9 +44,21 @@ function Viewer(div: HTMLDivElement, model: modelType) {
 	div.appendChild(renderer.domElement);
 	renderer.render(scene, camera);
 
+	let model_url = typeof model === 'string' ? model : '';
+
+	if (typeof model !== 'string') {
+		const res = await axios.get('api/model', {
+			params: {
+				h: model.hero,
+				s: model.skin,
+				k: model.key
+			}
+		}, );
+		model_url = res.data;
+	}
+
 	const loader = new GLTFLoader();
-	const model_path = typeof model === 'string' ? model : window.location.origin + '/models/' + model.hero + '/' + model.skin + '_' + model.key + '.gltf';
-	loader.load(model_path, (gltfScene) => {
+	loader.load(model_url, (gltfScene) => {
 		scene.add(gltfScene.scene);
 		gltfScene.scene.traverse((child: any) => {
 			const material: MeshStandardMaterial = child.material;
