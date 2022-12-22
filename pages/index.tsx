@@ -37,6 +37,7 @@ export async function getStaticProps() {
 			props: {
 				models: models,
 			},
+			revalidate: 60
 		};
 	} catch (error) {
 		console.log(error);
@@ -44,6 +45,7 @@ export async function getStaticProps() {
 			props: {
 				models: [],
 			},
+			revalidate: 60
 		};
 	}
 }
