@@ -1,22 +1,22 @@
-import axios from 'axios';
 import ModelViewer from 'components/ModelViewer';
-import {InferGetStaticPropsType} from 'next';
-import Link from 'next/link';
 import {useRouter} from 'next/router';
 import React from 'react';
-import getModelsNames from 'scripts/api/models';
+
+const check = (arr: any[]) => arr.every(a => typeof a === 'string');
 
 export default function Models() {
 	const query = useRouter().query;
 
-	if (typeof query.h === 'string' && typeof query.s === 'string' && typeof query.k === 'string') {
-		const hero = query.h;
-		const skin = query.s as EventsNameType;
-		const key = query.k;
+	if (check([query.h, query.e, query.k, query.v])) {
+		const hero = query.h as string;
+		const event = query.e as EventsNameType;
+		const key = query.k as string;
+		const version = Number(query.v);
+		const url = `models/${hero}/${event}_${key}`;
 
 		return (
 			<div className='w-screen, h-screen'>
-				<ModelViewer model={{hero, skin, key}} />
+				<ModelViewer model={{hero, event, key, v: version, url}} />
 			</div>
 		);
 	}

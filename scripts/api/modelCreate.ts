@@ -12,11 +12,12 @@ async function ModelCreate(model: modelAPIType) {
 
 	const model_url = `models/${model_hero}/${model_event + '_' + key}.gltf`;
 
-	const model_client: modelClientType = {
+	const model_client: modelType = {
 		hero: model_hero,
 		url: model_url,
 		event: model_event,
-		key: key
+		key: key,
+		v: 1
 	};
 
 	const stream = new Stream.PassThrough();

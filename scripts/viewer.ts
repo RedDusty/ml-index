@@ -1,7 +1,8 @@
 import axios from 'axios';
 import {AmbientLight, Color, DirectionalLight, FrontSide, MeshStandardMaterial, PerspectiveCamera, PointLight, Scene, sRGBEncoding, WebGLRenderer} from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
-import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader';
+import {GLTF, GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader';
+import lf from 'localforage';
 
 let frames: number;
 let scene: Scene = new Scene();
@@ -22,7 +23,7 @@ function init() {
 	ambient_light = new AmbientLight(0xffffff, 0.3);
 }
 
-async function Viewer(div: HTMLDivElement, model: modelType) {
+async function Viewer(div: HTMLDivElement, model: modelType | string) {
 	if (scene) {
 		scene.clear();
 	}
@@ -44,29 +45,57 @@ async function Viewer(div: HTMLDivElement, model: modelType) {
 	div.appendChild(renderer.domElement);
 	renderer.render(scene, camera);
 
-	let model_url = typeof model === 'string' ? model : '';
+	const blob_model = typeof model === 'string' ? model : null;
+	let model_data: Object | undefined = undefined;
+	const lfh = lf.createInstance({name: 'heroes', storeName: 'heroes'});
 
-	if (typeof model !== 'string') {
-		const res = await axios.get('api/model', {
-			params: {
-				h: model.hero,
-				s: model.skin,
-				k: model.key
+	const lf_model = typeof model !== 'string' ? model.hero + '_' + model.event + '_' + model.key : null;
+
+	if (typeof model !== 'string' && lf_model) {
+		try {
+			const local_model = await lfh.getItem(lf_model) as modelLocalType;
+			if (local_model && (local_model.v === model.v || window.navigator.onLine === false)) {
+				console.log('Loading model from cache...');
+				model_data = local_model.file;
+			} else {
+				throw new Error('Cached model not found');
 			}
-		}, );
-		model_url = res.data;
+		} catch (error) {
+			console.log('Loading model from server...');
+			const model_gltf = await getModelOnline(model);
+			if (typeof model_gltf === 'object') {
+				lfh.setItem(lf_model, {file: model_gltf, v: model.v} as modelLocalType);
+				model_data = model_gltf;
+			} else {
+				return returnError('No internet connection. Cached model not found.');
+			}
+		}
 	}
 
-	const loader = new GLTFLoader();
-	loader.load(model_url, (gltfScene) => {
-		scene.add(gltfScene.scene);
-		gltfScene.scene.traverse((child: any) => {
+	const gltfloader = new GLTFLoader();
+	try {
+		if (typeof blob_model === 'string') {
+			const gltf = await gltfloader.loadAsync(blob_model);
+			GLTFModel(gltf);
+		} else {
+			if (model_data) {
+				const gltf = await gltfloader.parseAsync(model_data as any, '');
+				GLTFModel(gltf);
+			} else return returnError('Model loading error');
+		}
+	} catch (error) {
+		return returnError(String(returnError || 'Loading model error'));
+	}
+
+	function GLTFModel(gltf: GLTF) {
+		scene.add(gltf.scene);
+		gltf.scene.traverse((child: any) => {
 			const material: MeshStandardMaterial = child.material;
 			if (material) {
 				material.side = FrontSide;
 			}
 		});
-	}, undefined, (e) => console.log(e));
+	}
 
 	scene.add(ambient_light);
 
@@ -96,6 +125,22 @@ function AnimateCancel() {
 	if (frames) {
 		cancelAnimationFrame(frames);
 	}
+}
+
+async function getModelOnline(model: modelType) {
+	const res = await axios.get('api/model', {
+		params: {
+			h: model.hero,
+			e: model.event,
+			k: model.key
+		}
+	});
+	
+	return res.data as Object | string;
+}
+
+function returnError(msg?: string) {
+	return msg || 'Error. Something went wrong...';
 }
 
 export {Viewer, Animate, AnimateCancel};
