@@ -1,7 +1,7 @@
 import React from 'react';
 import {Animate, AnimateCancel, Viewer} from 'scripts/viewer';
 
-export default function ModelViewer({model}: {model: modelType}) {
+export default function ModelViewer({model}: {model: modelType | string}) {
 	const threeRef = React.useRef<HTMLDivElement>(null);
 
 	React.useEffect(() => {
