@@ -13,6 +13,8 @@ export default async function getModelsNames() {
 			models.push(model);
 		}
 	}
+	
+	models.sort((a, b) => a.hero === b.hero ? a.event < b.event ? -1 : 1 : a.hero < b.hero ? -1 : 1);
 
 	return models;
 }

@@ -23,7 +23,7 @@ function init() {
 	ambient_light = new AmbientLight(0xffffff, 0.3);
 }
 
-async function Viewer(div: HTMLDivElement, model: modelType | string) {
+async function Viewer(div: HTMLDivElement, model: modelType | string): Promise<viewerStateType> {
 	if (scene) {
 		scene.clear();
 	}
@@ -53,7 +53,7 @@ async function Viewer(div: HTMLDivElement, model: modelType | string) {
 
 	if (typeof model !== 'string' && lf_model) {
 		try {
-			const local_model = await lfh.getItem(lf_model) as modelLocalType;
+			const local_model = await lfh.getItem(lf_model) as modelIndexedDBType;
 			if (local_model && (local_model.v === model.v || window.navigator.onLine === false)) {
 				console.log('Loading model from cache...');
 				model_data = local_model.file;
@@ -62,12 +62,24 @@ async function Viewer(div: HTMLDivElement, model: modelType | string) {
 			}
 		} catch (error) {
 			console.log('Loading model from server...');
-			const model_gltf = await getModelOnline(model);
-			if (typeof model_gltf === 'object') {
-				lfh.setItem(lf_model, {file: model_gltf, v: model.v} as modelLocalType);
-				model_data = model_gltf;
-			} else {
-				return returnError('No internet connection. Cached model not found.');
+			try {
+				const model_gltf = await getModelOnline(model);
+				if (typeof model_gltf === 'object') {
+					lfh.setItem(lf_model, {file: model_gltf, v: model.v} as modelIndexedDBType);
+					model_data = model_gltf;
+				} else {
+					if (navigator.onLine) {
+						return returnState('not_found');
+					} else {
+						return returnState('no_cache');
+					}
+				}
+			} catch (error) {
+				if (navigator.onLine) {
+					return returnState('not_found');
+				} else {
+					return returnState('no_cache');
+				}
 			}
 		}
 	}
@@ -81,10 +93,10 @@ async function Viewer(div: HTMLDivElement, model: modelType | string) {
 			if (model_data) {
 				const gltf = await gltfloader.parseAsync(model_data as any, '');
 				GLTFModel(gltf);
-			} else return returnError('Model loading error');
+			} else return returnState('error');
 		}
 	} catch (error) {
-		return returnError(String(returnError || 'Loading model error'));
+		return returnState('error');
 	}
 
 	function GLTFModel(gltf: GLTF) {
@@ -111,6 +123,8 @@ async function Viewer(div: HTMLDivElement, model: modelType | string) {
 	// scene.add(hemiLight);
 	
 	scene.add(point_light);
+
+	return 'done';
 }
 
 function Animate() {
@@ -139,8 +153,8 @@ async function getModelOnline(model: modelType) {
 	return res.data as Object | string;
 }
 
-function returnError(msg?: string) {
-	return msg || 'Error. Something went wrong...';
+function returnState(state: viewerStateType) {
+	return state;
 }
 
 export {Viewer, Animate, AnimateCancel};

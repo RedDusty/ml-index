@@ -17,3 +17,5 @@ type generalType = {
 }
 
 type editorType = 'hero' | 'ability' | 'model'
+
+type viewerStateType = 'loading' | 'error' | 'not_found' | 'no_cache' | 'done'

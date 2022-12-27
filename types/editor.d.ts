@@ -62,9 +62,26 @@ type modelType = {
 	url: string;
 }
 
-type modelLocalType = {
+type modelsType = {
+	hero: string;
+	event: EventsNameType;
+	key: string;
+	v: number;
+	url?: string;
+	file?: string;
+}
+
+type modelIndexedDBType = {
 	file: string;
 	v: number;
+}
+
+type modelCacheType = {
+	hero: string;
+	event: EventsNameType;
+	key: string;
+	v: number;
+	file: string;
 }
 
 type modelAPIType = {
