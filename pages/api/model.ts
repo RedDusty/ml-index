@@ -23,8 +23,8 @@ export default async function handler(
 
 	const model_file = await axios.get(model_url[0]);
 
-	if (model_file.data) {
-		return res.status(200).send(model_file.data);
+	if (model_file.config.url) {
+		return res.status(200).send(model_file.config.url);
 	}
 	
 	return res.status(404).send('Not found');

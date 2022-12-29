@@ -198,14 +198,18 @@ function AnimateCancel() {
 }
 
 async function getModelOnline(model_hero: string, model_key: string) {
-	const res = await axios.get('api/model', {
+	const res_url = await axios.get('api/model', {
 		params: {
 			h: model_hero,
 			k: model_key
 		}
 	});
 	
-	return res.data as Object | string;
+	const url = res_url.data as string;
+
+	const model = await axios.get(url);
+
+	return model.data as Object;
 }
 
 async function getModelInfoOnline(model_hero: string, model_key: string) {
