@@ -1,29 +1,37 @@
 import ModelViewer from 'components/ModelViewer';
+import Link from 'next/link';
 import {useRouter} from 'next/router';
 import React from 'react';
-
-const check = (arr: any[]) => arr.every(a => typeof a === 'string');
+import {useRecoilState} from 'recoil';
+import {modelState} from 'scripts/state';
 
 export default function Models() {
 	const query = useRouter().query;
+	const [model] = useRecoilState(modelState);
 
-	if (check([query.h, query.e, query.k, query.v])) {
-		const hero = query.h as string;
-		const event = query.e as EventsNameType;
-		const key = query.k as string;
-		const version = Number(query.v);
-		const url = `models/${hero}/${event}_${key}`;
-
+	if (model || (typeof query.h === 'string' && typeof query.k === 'string')) {
 		return (
 			<div className='w-screen, h-screen'>
-				<ModelViewer model={{hero, event, key, v: version, url}} />
+			<Link 
+				href='/' 
+				className='z-[3] fixed bg-sky-100 hover:bg-sky-200 text-sky-900 hover:text-sky-800 px-4 py-2 font-semibold top-2 left-2 rounded-md'>
+					Home
+			</Link>
+				<ModelViewer model={model as modelsType} h={query.h as string} k={query.k as string} />
 			</div>
 		);
 	}
 
 	return (
-		<div>
-			<p>query error</p>
+		<div className='w-screen h-screen flex justify-center items-center'>
+			<Link 
+				href='/' 
+				className='z-[3] fixed bg-sky-100 hover:bg-sky-200 text-sky-900 hover:text-sky-800 px-4 py-2 font-semibold top-2 left-2 rounded-md'>
+					Home
+			</Link>
+			<div className='fixed bg-red-100 p-16 rounded-md text-red-900 font-semibold text-xl text-center z-[2]'>
+				Model not selected
+			</div>
 		</div>
 	);
 }

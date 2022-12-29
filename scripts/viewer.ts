@@ -23,10 +23,39 @@ function init() {
 	ambient_light = new AmbientLight(0xffffff, 0.3);
 }
 
-async function Viewer(div: HTMLDivElement, model: modelType | string): Promise<viewerStateType> {
+type viewerType = {
+	div: HTMLDivElement;
+	model?: modelsType;
+	h?: string;
+	k?: string;
+	setState: React.Dispatch<React.SetStateAction<viewerStateType>>;
+	setOptState: React.Dispatch<React.SetStateAction<string | null>>;
+}
+
+async function Viewer({div, model, setOptState, setState, h, k}: viewerType) {
 	if (scene) {
 		scene.clear();
 	}
+
+	const model_hero = (model ? model.hero : undefined) || h;
+	const model_key = (model ? model.key : undefined) || k;
+
+	if (!model_hero || !model_key) {
+		setState('not_found');
+		setOptState('No model or queries to find it');
+		return;
+	}
+
+	const model_info: modelsType = {
+		event: model?.event || 'No data',
+		hero: model_hero,
+		image: model?.image || 'No data',
+		key: model_key,
+		title: model?.title || 'No data',
+		v: model?.v || -1,
+		file: model?.file,
+		url: model?.url
+	};
 
 	VIEWER_WIDTH = div.clientWidth;
 	VIEWER_HEIGHT = div.clientHeight;
@@ -49,36 +78,57 @@ async function Viewer(div: HTMLDivElement, model: modelType | string): Promise<v
 	let model_data: Object | undefined = undefined;
 	const lfh = lf.createInstance({name: 'heroes', storeName: 'heroes'});
 
-	const lf_model = typeof model !== 'string' ? model.hero + '_' + model.event + '_' + model.key : null;
+	setOptState('Checking cache');
+	const lf_model = typeof model !== 'string' ? model_hero + '_' + model_key : null;
+
+	try {
+		const info = await getModelInfoOnline(model_hero, model_key);
+		model_info.event = info.event || 'No data';
+		model_info.image = info.image || 'No data';
+		model_info.title = info.title || 'No data';
+		model_info.v = typeof info.v === 'number' ? info.v : -1;
+	} catch (error) {
+		
+	}
 
 	if (typeof model !== 'string' && lf_model) {
 		try {
 			const local_model = await lfh.getItem(lf_model) as modelIndexedDBType;
-			if (local_model && (local_model.v === model.v || window.navigator.onLine === false)) {
+			if (local_model && (local_model.v === model_info.v || window.navigator.onLine === false)) {
 				console.log('Loading model from cache...');
+				setOptState('Loading model from cache');
 				model_data = local_model.file;
 			} else {
 				throw new Error('Cached model not found');
 			}
 		} catch (error) {
 			console.log('Loading model from server...');
+			setOptState('Loading model from server');
 			try {
-				const model_gltf = await getModelOnline(model);
+				const model_gltf = await getModelOnline(model_hero, model_key);
 				if (typeof model_gltf === 'object') {
-					lfh.setItem(lf_model, {file: model_gltf, v: model.v} as modelIndexedDBType);
+					cacheModel(lfh, lf_model, model_info, model_hero, model_key, model_gltf);
 					model_data = model_gltf;
 				} else {
 					if (navigator.onLine) {
-						return returnState('not_found');
+						setState('not_found');
+						setOptState('Model not found on server');
+						return;
 					} else {
-						return returnState('no_cache');
+						setState('no_cache');
+						setOptState('Connect to the internet to load it');
+						return;
 					}
 				}
 			} catch (error) {
 				if (navigator.onLine) {
-					return returnState('not_found');
+					setState('not_found');
+					setOptState('Model not found on server');
+					return;
 				} else {
-					return returnState('no_cache');
+					setState('no_cache');
+					setOptState('Connect to the internet to load it');
+					return;
 				}
 			}
 		}
@@ -92,14 +142,22 @@ async function Viewer(div: HTMLDivElement, model: modelType | string): Promise<v
 		} else {
 			if (model_data) {
 				const gltf = await gltfloader.parseAsync(model_data as any, '');
+				setOptState('Reading model data');
 				GLTFModel(gltf);
-			} else return returnState('error');
+			} else {
+				setState('error');
+				setOptState('Model read error');
+				return;
+			};
 		}
 	} catch (error) {
-		return returnState('error');
-	}
+		setState('error');
+		setOptState('Model read error');
+		return;
+	};
 
 	function GLTFModel(gltf: GLTF) {
+		setState('done');
 		scene.add(gltf.scene);
 		gltf.scene.traverse((child: any) => {
 			const material: MeshStandardMaterial = child.material;
@@ -123,8 +181,6 @@ async function Viewer(div: HTMLDivElement, model: modelType | string): Promise<v
 	// scene.add(hemiLight);
 	
 	scene.add(point_light);
-
-	return 'done';
 }
 
 function Animate() {
@@ -141,20 +197,36 @@ function AnimateCancel() {
 	}
 }
 
-async function getModelOnline(model: modelType) {
+async function getModelOnline(model_hero: string, model_key: string) {
 	const res = await axios.get('api/model', {
 		params: {
-			h: model.hero,
-			e: model.event,
-			k: model.key
+			h: model_hero,
+			k: model_key
 		}
 	});
 	
 	return res.data as Object | string;
 }
 
-function returnState(state: viewerStateType) {
-	return state;
+async function getModelInfoOnline(model_hero: string, model_key: string) {
+	const res = await axios.get('/api/model_info', {
+		params: {
+			h: model_hero,
+			k: model_key
+		}
+	});
+	
+	return res.data as modelType;
+}
+
+async function cacheModel(lfh: LocalForage, lf_model: string, model_info: modelsType, model_hero: string, model_key: string, model_gltf: Object) {
+	try {
+		const res = await axios.request({method: 'GET', url: model_info.image, responseEncoding: 'binary', responseType: 'arraybuffer'});
+		const image = 'data:image/webp;base64,' + Buffer.from(res.data).toString('base64');
+		lfh.setItem(lf_model, {file: model_gltf, v: model_info.v, event: model_info.event, hero: model_hero, image: image, key: model_key, title: model_info.title} as modelIndexedDBType);
+	} catch (error) {
+		lfh.setItem(lf_model, {file: model_gltf, v: model_info.v, event: model_info.event, hero: model_hero, image: 'No data', key: model_key, title: model_info.title} as modelIndexedDBType);
+	}
 }
 
 export {Viewer, Animate, AnimateCancel};

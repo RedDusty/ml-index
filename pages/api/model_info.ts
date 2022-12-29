@@ -1,8 +1,8 @@
 import type {NextApiRequest, NextApiResponse} from 'next';
 import {getStorage} from 'firebase-admin/storage';
 import {firebase} from 'scripts/firebase';
-import axios from 'axios';
-import {signed_url_options, storage_model_path} from 'scripts/utils';
+import {signed_url_options, storage_portrait_path} from 'scripts/utils';
+import {getFirestore} from 'firebase-admin/firestore';
 
 const check = (arr: any[]) => arr.every(a => typeof a === 'string');
 
@@ -17,14 +17,15 @@ export default async function handler(
 		res.status(404).send('Query error');
 		return;
 	}
+	const model_doc = await getFirestore(firebase).collection('models').doc(key as string).get();
+	const model_info = model_doc.data() as modelType;
 
-	const model_path = storage_model_path(hero as string, key as string);
-	const model_url = await getStorage(firebase).bucket().file(model_path).getSignedUrl(signed_url_options);
+	const portrait = await getStorage(firebase).bucket().file(storage_portrait_path(hero as string, key as string)).getSignedUrl(signed_url_options);
 
-	const model_file = await axios.get(model_url[0]);
+	model_info.image = portrait[0];
 
-	if (model_file.data) {
-		return res.status(200).send(model_file.data);
+	if (model_info) {
+		return res.status(200).send(model_info);
 	}
 	
 	return res.status(404).send('Not found');

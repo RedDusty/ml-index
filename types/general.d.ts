@@ -7,7 +7,7 @@ type generalAbilitiesType = {
 }
 
 type generalEventType = {
-	name: EventsNameType;
+	name: string;
 	icon?: string;
 }
 

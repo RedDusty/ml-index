@@ -1,6 +1,7 @@
 import 'styles/globals.css';
 import type {AppProps} from 'next/app';
 import Head from 'next/head';
+import {RecoilRoot} from 'recoil';
 
 export default function App({Component, pageProps}: AppProps) {
 	
@@ -56,7 +57,9 @@ export default function App({Component, pageProps}: AppProps) {
 				<meta property="og:url" content="https://yourdomain.com" />
 				<meta property="og:image" content="https://yourdomain.com/icons/apple-touch-icon.png" /> */}
 			</Head>
-			<Component {...pageProps} />
+			<RecoilRoot>
+				<Component {...pageProps} />
+			</RecoilRoot>
 		</>
 	);
 }

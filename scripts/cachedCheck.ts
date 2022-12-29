@@ -2,14 +2,14 @@ import localforage from 'localforage';
 
 export default async function cachedCheck(prop_models: modelType[]) {
 	const lfh = localforage.createInstance({name: 'heroes', storeName: 'heroes'});
-	const c_models: modelCacheType[] = [];
+	const c_models: modelIndexedDBType[] = [];
 	const s_models: modelType[] = [];
 	
 	for (let idx = 0; idx < prop_models.length; idx++) {
 		const model = prop_models[idx];
-		const cached_model = await lfh.getItem(model.hero + '_' + model.event + '_' + model.key) as modelIndexedDBType;
+		const cached_model = await lfh.getItem(model.hero + '_' + model.key) as modelIndexedDBType;
 		if (cached_model) {
-			c_models.push({hero: model.hero, event: model.event, key: model.key, v: model.v, file: cached_model.file});
+			c_models.push({hero: model.hero, event: model.event, key: model.key, v: model.v, file: 'cached', image: cached_model.image, title: model.title});
 		} else s_models.push(model);
 	}
 

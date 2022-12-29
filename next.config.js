@@ -11,7 +11,10 @@ const withPWA = require('next-pwa')({
 const nextConfig = withPWA({
   reactStrictMode: true,
   swcMinify: true,
-  cleanDistDir: true
+  cleanDistDir: true,
+  images: {
+    domains: ['storage.googleapis.com']
+  }
 });
 
 module.exports = nextConfig;

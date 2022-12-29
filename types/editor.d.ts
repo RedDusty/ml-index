@@ -7,10 +7,8 @@ type abilityEffectType = 'charge' | 'burst' | 'blink' | 'aoe' | 'buff';
 
 type abilityTypeType = 'physical_skill' | 'charge' | 'blink';
 
-type EventsNameType = 'default' | 'The_Aspirants';
-
 type abilityEventIconsType = {
-	name: EventsNameType;
+	name: string;
 	event_icon: string;
 	icon: string;
 }
@@ -54,38 +52,31 @@ interface abilityType extends abilityBaseType, abilityLangType { }
 // 	url: string
 // }
 
-type modelType = {
+interface modelBaseType {
 	hero: string;
-	event: EventsNameType;
+	event: string;
+	title: string;
+	image: string;
+}
+
+interface modelMetaBaseType extends modelBaseType {
 	key: string;
 	v: number;
+}
+
+interface modelType extends modelMetaBaseType {
 	url: string;
 }
 
-type modelsType = {
-	hero: string;
-	event: EventsNameType;
-	key: string;
-	v: number;
+interface modelsType extends modelMetaBaseType {
 	url?: string;
 	file?: string;
 }
 
-type modelIndexedDBType = {
-	file: string;
-	v: number;
-}
-
-type modelCacheType = {
-	hero: string;
-	event: EventsNameType;
-	key: string;
-	v: number;
+interface modelIndexedDBType extends modelMetaBaseType {
 	file: string;
 }
 
-type modelAPIType = {
-	hero: string;
-	event: EventsNameType;
+interface modelAPIType extends modelBaseType {
 	file: string;
 }

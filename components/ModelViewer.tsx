@@ -1,46 +1,48 @@
-import Link from 'next/link';
 import React, {useState} from 'react';
 import {Animate, AnimateCancel, Viewer} from 'scripts/viewer';
 
-export default function ModelViewer({model}: {model: modelType | string}) {
+export default function ModelViewer({model, h, k}: {model?: modelsType, h?: string, k?: string}) {
 	const threeRef = React.useRef<HTMLDivElement>(null);
 	const [state, setState] = useState<viewerStateType>('loading');
-
+	const [optState, setOptState] = useState<string | null>('Loading 3d scene...');
+	
 	React.useEffect(() => {
-		const createViewer = async () => {
-			if (threeRef && threeRef.current) {
-				const viewerState = await Viewer(threeRef.current, model);
-				setState(viewerState);
-			}
-		};
-		if (threeRef && threeRef.current) {
-			createViewer();
+		if (threeRef && threeRef.current && (model || (h && k))) {
+			Viewer({div: threeRef.current, model, setOptState, setState, h, k});
+
 			Animate();
+			
 			return () => {
 				AnimateCancel();
 			};
 		}
-	}, [threeRef, model]);
+	}, [threeRef, model, h, k]);
 
 	return <div className="w-full h-full flex justify-center items-center">
 		<div ref={threeRef} className="w-screen h-screen fixed z-[1]"></div>
-		<Link href='/' className='z-[3] fixed bg-sky-100 hover:bg-sky-200 text-sky-900 hover:text-sky-800 px-4 py-2 font-semibold top-2 left-2 rounded-md'>Home</Link>
 		{
-			state === 'loading' ? <div className='fixed bg-sky-100 text-sky-800 p-16 rounded-md font-semibold text-xl text-center z-[2]'>Loading model...</div> : <></>
+			state === 'loading' ? <Window opt={optState} /> : <></>
 		}
 		{
-			state === 'done' || state === 'loading' ? <></> : <ErrorWindow state={state} />
+			state === 'done' || state === 'loading' ? <></> : <ErrorWindow state={state} opt={optState}/>
 		}
 	</div>;
 }
 
-function ErrorWindow({state}: {state: viewerStateType}) {
-	return <div className='fixed bg-red-100 p-16 rounded-md font-semibold text-xl text-center z-[2]'>
-		<p className='text-red-900'>
+function Window({opt}: { opt: string | null }) {
+	return <div className='fixed bg-sky-200 p-16 rounded-md z-[2] flex flex-col gap-4'>
+		<p className='text-sky-800 font-semibold text-xl text-center'>Loading model...</p>
+		{opt ? <p className='text-sky-700 font-semibold text-lg text-center'>{opt}</p> : <></>}
+	</div>;
+}
+
+function ErrorWindow({state, opt}: {state: viewerStateType, opt: string | null}) {
+	return <div className='fixed bg-red-100 p-16 rounded-md z-[2] flex flex-col gap-4'>
+		<p className='text-red-900 font-semibold text-xl text-center'>
 			{state === 'error' ? 'An unknown error has occurred': ''}
 			{state === 'not_found' ? 'This model does not exist': ''}
 			{state === 'no_cache' ? 'Offline. This model is not loaded': ''}
 		</p>
-		{state === 'no_cache' ? <p className='text-lg mt-4 text-red-700'>Load it when internet is available</p>: ''}
+		{opt ? <p className='text-red-700 font-semibold text-lg text-center'>{opt}</p> : <></>}
 	</div>;
 }
