@@ -46,7 +46,7 @@ export default function Models({prop_models}: InferGetStaticPropsType<typeof get
 								}}
 								className='relative hover:brightness-125'
 							>
-								<Image
+								<img
 									src={m.file ? m.image : (m.image || '/icons/hero_default.webp')}
 									alt="" width={240} height={390}
 									onError={e => e.currentTarget.src = '/icons/hero_default.webp'}

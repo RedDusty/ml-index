@@ -12,5 +12,5 @@ export default function EventIcon({event}: {event: string}) {
 		);
 	}
 
-	return <Image src={'/icons/events/' + event.charAt(0).toUpperCase() + event.slice(1) + '.webp'} width={90} height={40} alt='' className='absolute right-2 top-2' onError={() => setError(true)} />; 
+	return <img src={'/icons/events/' + event.charAt(0).toUpperCase() + event.slice(1) + '.webp'} width={90} height={40} alt='' className='absolute right-2 top-2' onError={() => setError(true)} />; 
 }
